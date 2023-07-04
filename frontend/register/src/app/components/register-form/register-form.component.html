@@ -1,0 +1,56 @@
+<form [formGroup]="registerForm">
+  <h1>Registro de usuario</h1>
+  <mat-form-field class="example-full-width">
+    <mat-label>Nombre</mat-label>
+    <input matInput placeholder="Ej. Macarena" formControlName="firstname" id="name"
+           matNativeControl="text">
+    <mat-error *ngIf="registerForm.controls['firstname'].errors?.['required']">
+      * Este campo debe estar completo
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls['firstname'].errors?.['minlength']">
+      * Este campo debe contener al menos 2 caracteres
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls['firstname'].errors?.['maxlength']">
+      * Este campo debe contener máximo 25 caracteres
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Apellido</mat-label>
+    <input matInput placeholder="Ej. Bernal" formControlName="lastname" id="lastname" matNativeControl="text">
+    <mat-error *ngIf="registerForm.controls['lastname'].errors?.['required']">
+      * Este campo debe estar completo
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls['lastname'].errors?.['minlength']">
+      * Este campo debe contener al menos 2 caracteres
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls['lastname'].errors?.['maxlength']">
+      * Este campo debe contener máximo 25 caracteres
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>E-mail</mat-label>
+    <input matInput placeholder="Ej. mbernal@asjservicios.com" formControlName="email"
+           id="email">
+      <mat-error *ngIf="registerForm.controls['email'].errors?.['required']">
+        * Este campo debe estar completo
+      </mat-error>
+      <mat-error *ngIf="registerForm.controls['email'].errors?.['email']">
+        * Este campo debe ser un e-mail
+      </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Contraseña</mat-label>
+    <input matInput placeholder="Ej. Maca1234" formControlName="password"
+           id="password" matNativeControl="password" type="password">
+    <mat-error *ngIf="registerForm.controls['password'].errors?.['required']">
+      * Este campo debe estar completo
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls['password'].errors?.['pattern']">
+      * Este campo debe contener al menos una mayúscula, una minúscula y un número
+    </mat-error>
+  </mat-form-field>
+  <section class="btn-container">
+    <button mat-button color="primary" class="register" type="submit" (click)="addUser()">Registrar</button>
+    <button mat-button color="warn" type="reset" class="cancel">Cancelar</button>
+  </section>
+</form>
