@@ -77,6 +77,9 @@ export class RegisterFormComponent implements OnInit {
         next: (response:any) => {
           if(!response.error){
             this.payload = response;
+            
+            console.log("payload:");
+            console.dir(this.payload);
           }
         },
         error: (error:string)=> {

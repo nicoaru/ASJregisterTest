@@ -9,7 +9,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 })
 export class RegisterService {
   _registerURL: string = "http://localhost:8080/api/users/register";
-  _getPayloadURL:string = "http://srvdock01t.petersen.corp/obpm12/solicitud/payload";
+  _getPayloadURL:string = "http://srvdock01t.petersen.corp:9267/obpm12/solicitud/payload";
 
   constructor(private http: HttpClient) { }
 
@@ -43,7 +43,7 @@ export class RegisterService {
     }});
 
     
-    return this.http.get(this._getPayloadURL+params.toString(), this.getHttpOptions()).pipe(catchError(this.handlerException));
+    return this.http.get(this._getPayloadURL+"?"+params.toString(), this.getHttpOptions()).pipe(catchError(this.handlerException));
     
   }
 
