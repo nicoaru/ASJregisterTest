@@ -9,7 +9,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 })
 export class RegisterService {
   _registerURL: string = "http://localhost:8080/api/users/register";
-  _getPayloadURL:string = "http://srvdock01t.petersen.corp:9267/obpm12/solicitud/payload";
+  _getPayloadURL:string = "http://localhost:8080/api/BPM/getPayload";
 
   constructor(private http: HttpClient) { }
 

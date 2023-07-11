@@ -1,0 +1,14 @@
+{
+  "name": "PageFlowEngine",
+  "type": "WEB_SERVICE",
+  "subType": "REST",
+  "properties": {
+    "protocol": "http",
+    "host": "srvdock01t.petersen.corp",
+    "port": "9267",
+    "path": "",
+    "http.authorization.type": "",
+    "user": "",
+    "password": ""
+  }
+}
