@@ -16,6 +16,9 @@ export class RegisterFormComponent implements OnInit {
   maxChars: number = 25;
   user: User | undefined;
   payload: any;
+  bpmContextId: any;
+  bpmWorklistTaskId: any;
+  bpmWorklistContext: any;
 
   pass: RegExp = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,20})');
 
@@ -61,35 +64,14 @@ export class RegisterFormComponent implements OnInit {
     });
 
     this.activatedRoute.queryParamMap.subscribe((params) => {
-      const bpmContextId = params.get('contextId');
-      const bpmWorklistTaskId = params.get('bpmWorklistTaskId');
-      console.log('bpmWorklistTaskId:   ', bpmWorklistTaskId);
-      const bpmWorklistContext = params.get('bpmWorklistContext');
-      console.log('bpmWorklistContext:   ', bpmWorklistContext);
-
-      if (
-        bpmContextId === null ||
-        bpmWorklistTaskId === null ||
-        bpmWorklistContext === null
-      )
-        return console.log('Faltan datos de BPM Context');
-
-      this.userService
-        .getBpmPayload(bpmWorklistTaskId, bpmWorklistContext)
-        .subscribe({
-          next: (response: any) => {
-            if (!response.error) {
-              this.payload = response;
-
-              console.log('payload:');
-              console.dir(this.payload);
-            }
-          },
-          error: (error: string) => {
-            console.log('Error solicitando bpm task payload: ', error);
-          },
-        });
+      this.bpmContextId = params.get('contextId');
+      this.bpmWorklistTaskId = params.get('bpmWorklistTaskId');
+      console.log('bpmWorklistTaskId:   ', this.bpmWorklistTaskId);
+      this.bpmWorklistContext = params.get('bpmWorklistContext');
+      console.log('bpmWorklistContext:   ', this.bpmWorklistContext);
     });
+
+    this.getBpmPayload();
   }
 
   addUser(): void {
@@ -99,23 +81,77 @@ export class RegisterFormComponent implements OnInit {
       this.registerForm.value.email,
       this.registerForm.value.password
     );
-    this.userService.addUser(this.user).subscribe(
-      (response: any) => {
-        if (!response.error) {
-          toastSuccess
-            .fire({
-              icon: 'success',
-              title: 'Usuario registrado',
-            })
-            .then(() => location.reload());
+    this.userService.addUser(this.user)
+      .subscribe({
+        next: async (response:any) => {
+          if (!response.error) {
+
+            const updatedPayload = {...this.payload, userId: response.id}
+            console.log("payload para update: ", JSON.stringify(updatedPayload));
+            await this.updateBpmPayload(updatedPayload);
+            
+            toastSuccess
+              .fire({
+                icon: 'success',
+                title: 'Usuario registrado',
+              })
+              //.then(() => location.reload());
+          }
+        },
+        error: (error: string) => {
+          toastError.fire({
+            icon: 'error',
+            title: error,
+          });
         }
-      },
-      (error: string) => {
-        toastError.fire({
-          icon: 'error',
-          title: error,
-        });
-      }
-    );
+      });
   }
+
+
+  async getBpmPayload() {
+    if (
+      this.bpmContextId === null ||
+      this.bpmWorklistTaskId === null ||
+      this.bpmWorklistContext === null
+    )
+      return console.log('Faltan datos de BPM Context');
+
+    this.userService
+      .getBpmPayload(this.bpmWorklistTaskId, this.bpmWorklistContext)
+      .subscribe({
+        next: (response: any) => {
+          if (!response.error) {
+            this.payload = response;
+
+            console.log('payload: ', JSON.stringify(this.payload));
+          }
+        },
+        error: (error: string) => {
+          console.log('Error solicitando bpm task payload: ', error);
+        },
+      });
+  }
+
+
+  async updateBpmPayload(updatedPayload:Record<string, string>) {
+    console.log("Entró en updateBpmPayload");
+    
+    if(!this.payload) return console.log("No hay payload para actualizar")
+
+    this.userService.updateBpmPayload(this.bpmWorklistTaskId, this.bpmWorklistContext, updatedPayload)
+    .subscribe({
+      next: (response: any) => {
+        if (!response?.error) {
+          console.log('updatedPayload: ', response);
+        }
+        
+      },
+      error: (error: string) => {
+        console.log('Error haciendo update del payload: ', error);
+      },
+    });
+    
+  }
+
+
 }

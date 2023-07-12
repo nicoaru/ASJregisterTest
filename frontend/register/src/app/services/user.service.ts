@@ -13,7 +13,7 @@ import { catchError } from 'rxjs';
 })
 export class UserService {
   _userURL: string = 'http://localhost:8080/api/users';
-  _getPayloadURL: string = 'http://localhost:8080/api/BPM/getPayload';
+  _bpmPayloadURL: string = 'http://localhost:8080/api/BPM/payload';
 
   constructor(private http: HttpClient) {}
 
@@ -51,9 +51,24 @@ export class UserService {
     });
 
     return this.http
-      .get(this._getPayloadURL + '?' + params.toString(), this.getHttpOptions())
+      .get(this._bpmPayloadURL + '?' + params.toString(), this.getHttpOptions())
       .pipe(catchError(this.handlerException));
   }
+
+  updateBpmPayload(bpmWorklistTaskId: string, bpmWorklistContext: string, updatedPayload:Record<string, string>) {
+    let params = new HttpParams({
+      fromObject: {
+        bpmWorklistTaskId: bpmWorklistTaskId,
+        bpmWorklistContext: bpmWorklistContext,
+      },
+    });
+
+    return this.http
+      .put(this._bpmPayloadURL + '?' + params.toString(), updatedPayload, this.getHttpOptions())
+      .pipe(catchError(this.handlerException));
+  }
+
+
 
   getUser(userId: string): any {
     return this.http
