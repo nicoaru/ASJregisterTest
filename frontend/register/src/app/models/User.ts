@@ -9,10 +9,10 @@ export class User {
   set setFirstname(firstname: string) {
     this.firstname = firstname;
   }
-  set setLastname(user: User) {
-    this.lastname = user.lastname;
+  set setLastname(lastname: string) {
+    this.lastname = lastname;
   }
-  set setEmail(user: User) {
-    this.email = user.email;
+  set setEmail(email: string) {
+    this.email = email;
   }
 }
