@@ -1,33 +1,32 @@
 export class User {
   constructor(
-    public firstname?: string,
-    public lastname?: string,
-    public email?: string,
-    public password?: string
-  ) {
+    private firstname?: string,
+    private lastname?: string,
+    private email?: string,
+    private password?: string
+  ) {}
+
+  set _firstname(value: string | undefined) {
+    this.firstname = value;
   }
 
-  set setFirstname(firstname: string) {
-    this.firstname = firstname;
+  get _firstname(): string | undefined {
+    return this.firstname;
   }
 
-  get getFirstname(): string {
-    return <string>this.firstname;
+  set _lastname(value: string | undefined) {
+    this.lastname = value;
   }
 
-  set setLastname(lastname: string) {
-    this.lastname = lastname;
+  get _lastname(): string | undefined {
+    return this.lastname;
   }
 
-  get getLastname(): string {
-    return <string>this.lastname;
+  set _email(value: string | undefined) {
+    this.email = value;
   }
 
-  set setEmail(email: string) {
-    this.email = email;
-  }
-
-  get getEmail(): string {
-    return <string>this.email;
+  get _email(): string | undefined {
+    return this.email;
   }
 }

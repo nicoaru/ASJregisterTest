@@ -10,7 +10,7 @@ import { toastSuccess } from 'src/main';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent{
   updateForm!: FormGroup;
   minChars: number = 2;
   maxChars: number = 25;
@@ -42,9 +42,11 @@ export class ProfileComponent implements OnInit {
       ],
       email: ['', Validators.compose([Validators.required, Validators.email])],
     });
+
+    this.user = new User();
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     // this.activatedRoute.queryParamMap.subscribe((params) => {
     //   const bpmContextId = params.get('contextId');
     //   const bpmWorklistTaskId = params.get('bpmWorklistTaskId');
@@ -82,12 +84,15 @@ export class ProfileComponent implements OnInit {
     this.userService.getUser('1').subscribe({
       next: (response: any) => {
         if (!response.error) {
-          this.user = response;
+          this.user = new User();
+          this.user._firstname = response.firstname;
+          this.user._lastname = response.lastname;
+          this.user._email = response.email;
           console.dir(this.user);
           this.updateForm.patchValue({
-            firstname: this.user?.firstname,
-            lastname: this.user?.lastname,
-            email: this.user?.email,
+            firstname: this.user._firstname,
+            lastname: this.user._lastname,
+            email: this.user._email,
           });
         }
       },
@@ -97,10 +102,11 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+
   updateUser() {
-    this.user!.setFirstname = this.updateForm.value.firstname;
-    this.user!.setLastname = this.updateForm.value.lastname;
-    this.user!.setEmail = this.updateForm.value.email;
+    this.user!._firstname = this.updateForm.value.firstname;
+    this.user!._lastname = this.updateForm.value.lastname;
+    this.user!._email = this.updateForm.value.email;
     console.log(this.user);
 
     this.userService.updateUser('1', this.user).subscribe({
