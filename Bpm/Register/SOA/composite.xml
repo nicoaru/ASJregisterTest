@@ -23,6 +23,11 @@
         <interface.wsdl interface="http://xmlns.oracle.com/bpel/workflow/taskService#wsdl.interface(TaskService)"
                         callbackInterface="http://xmlns.oracle.com/bpel/workflow/taskService#wsdl.interface(TaskServiceCallback)"/>
       </reference>
+      <reference name="HumanTasks.UpdateUser.reference"
+                 ui:wsdlLocation="oramds:/soa/shared/workflow/TaskServiceInterface.wsdl">
+        <interface.wsdl interface="http://xmlns.oracle.com/bpel/workflow/taskService#wsdl.interface(TaskService)"
+                        callbackInterface="http://xmlns.oracle.com/bpel/workflow/taskService#wsdl.interface(TaskServiceCallback)"/>
+      </reference>
     </componentType>
     <property name="bpel.config.oneWayDeliveryPolicy" type="xs:string" many="false">sync</property>
     <property name="bpel.config.transaction" type="xs:string" many="false">required</property>
@@ -36,8 +41,21 @@
       </service>
     </componentType>
   </component>
+  <component name="UpdateUser">
+    <implementation.workflow src="HumanTasks/UpdateUser.task"/>
+    <componentType>
+      <service name="TaskService" ui:wsdlLocation="oramds:/soa/shared/workflow/TaskServiceInterface.wsdl">
+        <interface.wsdl interface="http://xmlns.oracle.com/bpel/workflow/taskService#wsdl.interface(TaskService)"
+                        callbackInterface="http://xmlns.oracle.com/bpel/workflow/taskService#wsdl.interface(TaskServiceCallback)"/>
+      </service>
+    </componentType>
+  </component>
   <wire>
     <source.uri>Process/HumanTasks.Register.reference</source.uri>
     <target.uri>Register/TaskService</target.uri>
+  </wire>
+  <wire>
+    <source.uri>Process/HumanTasks.UpdateUser.reference</source.uri>
+    <target.uri>UpdateUser/TaskService</target.uri>
   </wire>
 </composite>

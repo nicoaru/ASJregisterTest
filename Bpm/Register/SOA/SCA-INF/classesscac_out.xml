@@ -10,4 +10,14 @@
       <fix/>
       <msg>Error assignee not specified</msg>
    </Fault>
+   <Fault>
+      <severity>warning</severity>
+      <loc/>
+      <line/>
+      <col/>
+      <file>HumanTasks/UpdateUser.task</file>
+      <name>HumanTasks/UpdateUser.task</name>
+      <fix/>
+      <msg>Error assignee not specified</msg>
+   </Fault>
 </Faults>

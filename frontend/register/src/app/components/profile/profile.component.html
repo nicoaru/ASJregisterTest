@@ -1,0 +1,45 @@
+<mat-toolbar color="primary" class="mat-h1">
+  Mi perfil
+</mat-toolbar>
+<form [formGroup]="updateForm">
+  <mat-form-field class="example-full-width">
+    <mat-label>Nombre</mat-label>
+    <input matInput placeholder="Ej. Macarena" formControlName="firstname" id="name" matNativeControl="text">
+    <mat-error *ngIf="updateForm.controls['firstname'].errors?.['required']">
+      * Este campo debe estar completo
+    </mat-error>
+    <mat-error *ngIf="updateForm.controls['firstname'].errors?.['minlength']">
+      * Este campo debe contener al menos 2 caracteres
+    </mat-error>
+    <mat-error *ngIf="updateForm.controls['firstname'].errors?.['maxlength']">
+      * Este campo debe contener máximo 25 caracteres
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Apellido</mat-label>
+    <input matInput placeholder="Ej. Bernal" formControlName="lastname" id="lastname" matNativeControl="text">
+    <mat-error *ngIf="updateForm.controls['lastname'].errors?.['required']">
+      * Este campo debe estar completo
+    </mat-error>
+    <mat-error *ngIf="updateForm.controls['lastname'].errors?.['minlength']">
+      * Este campo debe contener al menos 2 caracteres
+    </mat-error>
+    <mat-error *ngIf="updateForm.controls['lastname'].errors?.['maxlength']">
+      * Este campo debe contener máximo 25 caracteres
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>E-mail</mat-label>
+    <input matInput placeholder="Ej. mbernal@asjservicios.com" formControlName="email" id="email">
+    <mat-error *ngIf="updateForm.controls['email'].errors?.['required']">
+      * Este campo debe estar completo
+    </mat-error>
+    <mat-error *ngIf="updateForm.controls['email'].errors?.['email']">
+      * Este campo debe ser un e-mail
+    </mat-error>
+  </mat-form-field>
+  <section class="btn-container">
+    <button mat-button color="primary" class="register" type="submit" (click)="updateUser()">Editar</button>
+    <button mat-button color="warn" type="reset" class="cancel">Cancelar</button>
+  </section>
+</form>

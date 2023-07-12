@@ -10,11 +10,13 @@ import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {HttpClientModule} from "@angular/common/http";
 import {MatToolbarModule} from "@angular/material/toolbar";
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RegisterFormComponent
+    RegisterFormComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
