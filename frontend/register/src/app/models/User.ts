@@ -4,15 +4,30 @@ export class User {
     public lastname?: string,
     public email?: string,
     public password?: string
-  ) {}
+  ) {
+  }
 
   set setFirstname(firstname: string) {
     this.firstname = firstname;
   }
-  set setLastname(user: User) {
-    this.lastname = user.lastname;
+
+  get getFirstname(): string {
+    return <string>this.firstname;
   }
-  set setEmail(user: User) {
-    this.email = user.email;
+
+  set setLastname(lastname: string) {
+    this.lastname = lastname;
+  }
+
+  get getLastname(): string {
+    return <string>this.lastname;
+  }
+
+  set setEmail(email: string) {
+    this.email = email;
+  }
+
+  get getEmail(): string {
+    return <string>this.email;
   }
 }

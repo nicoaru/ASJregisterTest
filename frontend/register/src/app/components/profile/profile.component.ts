@@ -98,9 +98,9 @@ export class ProfileComponent implements OnInit {
   }
 
   updateUser() {
-    this.user!.firstname = this.updateForm.value.firstname;
-    this.user!.lastname = this.updateForm.value.lastname;
-    this.user!.email = this.updateForm.value.email;
+    this.user!.setFirstname = this.updateForm.value.firstname;
+    this.user!.setLastname = this.updateForm.value.lastname;
+    this.user!.setEmail = this.updateForm.value.email;
     console.log(this.user);
 
     this.userService.updateUser('1', this.user).subscribe({
