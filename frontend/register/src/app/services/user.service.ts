@@ -14,6 +14,7 @@ import { catchError } from 'rxjs';
 export class UserService {
   _userURL: string = 'http://localhost:8080/api/users';
   _bpmPayloadURL: string = 'http://localhost:8080/api/BPM/payload';
+  _bpmAvanzarUrl: string = 'http://localhost:8080/api/BPM/avanzar';
 
   constructor(private http: HttpClient) {}
 
@@ -42,6 +43,21 @@ export class UserService {
       .pipe(catchError(this.handlerException));
   }
 
+  getUser(userId: string): any {
+    return this.http
+      .get(this._userURL + `/${userId}`, this.getHttpOptions())
+      .pipe(catchError(this.handlerException));
+  }
+
+  updateUser(userId: string, user: User | undefined) {
+    return this.http
+      .put(this._userURL + `/${userId}`, user, this.getHttpOptions())
+      .pipe(catchError(this.handlerException));
+  }
+
+
+
+
   getBpmPayload(bpmWorklistTaskId: string, bpmWorklistContext: string) {
     let params = new HttpParams({
       fromObject: {
@@ -68,17 +84,23 @@ export class UserService {
       .pipe(catchError(this.handlerException));
   }
 
+  avanzarBpmProcess(bpmWorklistTaskId: string, bpmWorklistContext: string, body:Record<string, string>) {
+    let params = new HttpParams({
+      fromObject: {
+        bpmWorklistTaskId: bpmWorklistTaskId,
+        bpmWorklistContext: bpmWorklistContext,
+      },
+    });
 
-
-  getUser(userId: string): any {
     return this.http
-      .get(this._userURL + `/${userId}`, this.getHttpOptions())
+      .post(this._bpmAvanzarUrl + '?' + params.toString(), body, this.getHttpOptions())
       .pipe(catchError(this.handlerException));
   }
 
-  updateUser(userId: string, user: User | undefined) {
-    return this.http
-      .put(this._userURL + `/${userId}`, user, this.getHttpOptions())
-      .pipe(catchError(this.handlerException));
-  }
+
+
+
+
+
+
 }

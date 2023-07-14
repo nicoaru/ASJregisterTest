@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/User';
 import { UserService } from 'src/app/services/user.service';
@@ -10,12 +10,15 @@ import { toastSuccess } from 'src/main';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent{
+export class ProfileComponent implements AfterViewInit {
   updateForm!: FormGroup;
   minChars: number = 2;
   maxChars: number = 25;
   user: User | undefined;
   payload: any;
+  bpmContextId: any;
+  bpmWorklistTaskId: any;
+  bpmWorklistContext: any;
 
   constructor(
     formBuilder: FormBuilder,
@@ -46,42 +49,8 @@ export class ProfileComponent{
     this.user = new User();
   }
 
-  ngAfterViewInit() {
-    // this.activatedRoute.queryParamMap.subscribe((params) => {
-    //   const bpmContextId = params.get('contextId');
-    //   const bpmWorklistTaskId = params.get('bpmWorklistTaskId');
-    //   console.log('bpmWorklistTaskId:   ', bpmWorklistTaskId);
-    //   const bpmWorklistContext = params.get('bpmWorklistContext');
-    //   console.log('bpmWorklistContext:   ', bpmWorklistContext);
-
-    //   if (
-    //     bpmContextId === null ||
-    //     bpmWorklistTaskId === null ||
-    //     bpmWorklistContext === null
-    //   )
-    //     return console.log('Faltan datos de BPM Context');
-
-    //   this.userService
-    //     .getBpmPayload(bpmWorklistTaskId, bpmWorklistContext)
-    //     .subscribe({
-    //       next: (response: any) => {
-    //         if (!response.error) {
-    //           this.payload = response;
-
-    //           console.log('payload:');
-    //           console.dir(this.payload);
-    this.getUser();
-    //         }
-    //       },
-    //       error: (error: string) => {
-    //         console.log('Error solicitando bpm task payload: ', error);
-    //       },
-    //     });
-    // });
-  }
-
   getUser() {
-    this.userService.getUser('1').subscribe({
+    this.userService.getUser(this.payload.userId).subscribe({
       next: (response: any) => {
         if (!response.error) {
           this.user = new User();
@@ -102,16 +71,21 @@ export class ProfileComponent{
     });
   }
 
-
   updateUser() {
     this.user!._firstname = this.updateForm.value.firstname;
     this.user!._lastname = this.updateForm.value.lastname;
     this.user!._email = this.updateForm.value.email;
     console.log(this.user);
 
-    this.userService.updateUser('1', this.user).subscribe({
+    this.userService.updateUser(this.payload.userId, this.user).subscribe({
       next: (response: any) => {
         if (!response.error) {
+          if(this.payload) {
+            const updatedPayload = {...this.payload, userId: response.id}
+            this.avanzarSolicitud(updatedPayload);
+          }
+          else console.log("No se pudo obtener el payload. No se puede avanzar.");
+
           toastSuccess.fire({
             icon: 'success',
             title: 'Usuario modificado',
@@ -122,6 +96,98 @@ export class ProfileComponent{
       error: (error: string) => {
         console.log('Error actualizando el usuario: ', error);
       },
+    });
+  }
+
+  async getBpmPayload() {
+    if (
+      this.bpmContextId === null ||
+      this.bpmWorklistTaskId === null ||
+      this.bpmWorklistContext === null
+    )
+      return console.log('Faltan datos de BPM para obtener el payload');
+
+    this.userService
+      .getBpmPayload(this.bpmWorklistTaskId, this.bpmWorklistContext)
+      .subscribe({
+        next: (response: any) => {
+          if (!response.error) {
+            this.payload = response;
+
+            console.log('payload: ', JSON.stringify(this.payload));
+          }
+        },
+        error: (error: string) => {
+          console.log('Error solicitando bpm task payload: ', error);
+        },
+      });
+  }
+
+  avanzarSolicitud(updatedPayload: Record<string, string>) {
+    console.log('Entró en avanzarSolicitud');
+
+    const body: Record<string, string> = {
+      ...updatedPayload,
+      outcome: 'OK',
+    };
+
+    this.userService
+      .avanzarBpmProcess(this.bpmWorklistTaskId, this.bpmWorklistContext, body)
+      .subscribe({
+        next: (response: any) => {
+          if (!response?.error) {
+            console.log('AVANZAR SOLICITUD: OK');
+          }
+        },
+        error: (error: string) => {
+          console.log('Error haciendo avanzar la solicitud: ', error);
+        },
+      });
+  }
+
+  // ngOnInit(): void {
+  //   this.activatedRoute.queryParamMap.subscribe((params) => {
+  //     this.bpmContextId = params.get('contextId');
+  //     this.bpmWorklistTaskId = params.get('bpmWorklistTaskId');
+  //     this.bpmWorklistContext = params.get('bpmWorklistContext');
+
+  //     console.log('bpmWorklistTaskId:   ', this.bpmWorklistTaskId);
+  //     console.log('bpmWorklistContext:   ', this.bpmWorklistContext);
+  //   });
+
+  //   this.getBpmPayload();
+    
+  // }
+
+  ngAfterViewInit() {
+    this.activatedRoute.queryParamMap.subscribe((params) => {
+      this.bpmContextId = params.get('contextId');
+      this.bpmWorklistTaskId = params.get('bpmWorklistTaskId');
+      this.bpmWorklistContext = params.get('bpmWorklistContext');
+
+      if (
+        this.bpmContextId === null ||
+        this.bpmWorklistTaskId === null ||
+        this.bpmWorklistContext === null
+      )
+        return console.log('Faltan datos de BPM Context');
+
+      this.userService
+        .getBpmPayload(this.bpmWorklistTaskId, this.bpmWorklistContext)
+        .subscribe({
+          next: (response: any) => {
+            if (!response.error) {
+              this.payload = response;
+
+              console.log('payload:');
+              console.dir(this.payload);
+              this.getUser();
+            }
+          },
+          error: (error: string) => {
+            console.log('Error solicitando bpm task payload: ', error);
+          },
+        });
     });
   }
 }

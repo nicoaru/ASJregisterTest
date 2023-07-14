@@ -28,4 +28,14 @@ public class BPMController {
         System.out.println("response: "+response);
         return response;
     }
+
+    @PostMapping("/avanzar")
+    public ResponseEntity<Void> avanzarSolicitud(@RequestParam String bpmWorklistTaskId, @RequestParam String bpmWorklistContext, @RequestBody Map<String, String> body) {
+        System.out.println("Entro en POST '/api/BPM/avanzar");
+        bpmService.avanzarSolicitud(bpmWorklistTaskId, bpmWorklistContext, body);
+        ResponseEntity response = ResponseEntity.status(HttpStatus.OK).body(null);
+        System.out.println("response: "+response);
+        return response;
+    }
+
 }

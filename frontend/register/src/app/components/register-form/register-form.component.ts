@@ -19,6 +19,7 @@ export class RegisterFormComponent implements OnInit {
   bpmContextId: any;
   bpmWorklistTaskId: any;
   bpmWorklistContext: any;
+  loading: boolean = false;
 
   pass: RegExp = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,20})');
 
@@ -57,17 +58,18 @@ export class RegisterFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        console.log('Current URL:', event.url); // Output the actual URL
-      }
-    });
+    // this.router.events.subscribe((event) => {
+    //   if (event instanceof NavigationEnd) {
+    //     console.log('Current URL:', event.url); // Output the actual URL
+    //   }
+    // });
 
     this.activatedRoute.queryParamMap.subscribe((params) => {
       this.bpmContextId = params.get('contextId');
       this.bpmWorklistTaskId = params.get('bpmWorklistTaskId');
-      console.log('bpmWorklistTaskId:   ', this.bpmWorklistTaskId);
       this.bpmWorklistContext = params.get('bpmWorklistContext');
+      
+      console.log('bpmWorklistTaskId:   ', this.bpmWorklistTaskId);
       console.log('bpmWorklistContext:   ', this.bpmWorklistContext);
     });
 
@@ -83,19 +85,21 @@ export class RegisterFormComponent implements OnInit {
     );
     this.userService.addUser(this.user)
       .subscribe({
-        next: async (response:any) => {
+        next: (response:any) => {
           if (!response.error) {
 
-            const updatedPayload = {...this.payload, userId: response.id}
-            console.log("payload para update: ", JSON.stringify(updatedPayload));
-            await this.updateBpmPayload(updatedPayload);
+            if(this.payload) {
+              const updatedPayload = {...this.payload, userId: response.id}
+              this.avanzarSolicitud(updatedPayload);
+            }
+            else console.log("No se pudo obtener el payload. No se puede avanzar.");
             
             toastSuccess
-              .fire({
-                icon: 'success',
-                title: 'Usuario registrado',
-              })
-              //.then(() => location.reload());
+            .fire({
+              icon: 'success',
+              title: 'Usuario registrado',
+            })
+            //.then(() => location.reload());
           }
         },
         error: (error: string) => {
@@ -114,7 +118,7 @@ export class RegisterFormComponent implements OnInit {
       this.bpmWorklistTaskId === null ||
       this.bpmWorklistContext === null
     )
-      return console.log('Faltan datos de BPM Context');
+      return console.log('Faltan datos de BPM para obtener el payload');
 
     this.userService
       .getBpmPayload(this.bpmWorklistTaskId, this.bpmWorklistContext)
@@ -136,8 +140,6 @@ export class RegisterFormComponent implements OnInit {
   async updateBpmPayload(updatedPayload:Record<string, string>) {
     console.log("Entró en updateBpmPayload");
     
-    if(!this.payload) return console.log("No hay payload para actualizar")
-
     this.userService.updateBpmPayload(this.bpmWorklistTaskId, this.bpmWorklistContext, updatedPayload)
     .subscribe({
       next: (response: any) => {
@@ -149,8 +151,26 @@ export class RegisterFormComponent implements OnInit {
       error: (error: string) => {
         console.log('Error haciendo update del payload: ', error);
       },
-    });
+    });    
+  }
+
+
+  avanzarSolicitud(updatedPayload:Record<string, string>) {
+    console.log("Entró en avanzarSolicitud");
+
+    const body:Record<string, string> = {...updatedPayload, outcome: "SUBMIT"};
     
+    this.userService.avanzarBpmProcess(this.bpmWorklistTaskId, this.bpmWorklistContext, body)
+    .subscribe({
+      next: (response: any) => {
+        if (!response?.error) {
+          console.log('AVANZAR SOLICITUD: OK');
+        }
+      },
+      error: (error: string) => {
+        console.log('Error haciendo avanzar la solicitud: ', error);
+      },
+    });    
   }
 
 

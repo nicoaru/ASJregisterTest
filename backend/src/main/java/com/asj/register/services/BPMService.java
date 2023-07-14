@@ -21,9 +21,10 @@ import java.util.Map;
 public class BPMService implements IBPMService {
 
     private final String PAYLOAD_PATH = "obpm12/solicitud/payload";
+    private final String AVANZAR_PATH = "obpm12/solicitud/avanzar";
 
 
-    private String getURLFromBesyReference() {
+    private String getPfeUrlFromBesyReference() {
         WebServiceRest obpmWS;
         try {
             obpmWS = (WebServiceRest)  new BesyReferences().getExternalResource("PageFlowEngineWS");
@@ -35,9 +36,9 @@ public class BPMService implements IBPMService {
 
     @Override
     public Map<String, String> getPayload(String bpmWorklistTaskId, String bpmWorklistContext) {
-        String url = this.getURLFromBesyReference();
+        String pfeUrl = this.getPfeUrlFromBesyReference();
         String urlParams = "?bpmWorklistTaskId=" + bpmWorklistTaskId + "&bpmWorklistContext=" + bpmWorklistContext;
-        String completeUrl =  url+PAYLOAD_PATH+urlParams;
+        String completeUrl =  pfeUrl+PAYLOAD_PATH+urlParams;
         System.out.println(completeUrl);
         try {
             Map<String, String> response = new RestTemplate().getForObject(completeUrl, new HashMap<String, String>().getClass() );
@@ -52,20 +53,17 @@ public class BPMService implements IBPMService {
 
     }
 
-
-
     @Override
     public Map<String, String> updatePayload(String bpmWorklistTaskId, String bpmWorklistContext, Map<String, String> updatedPayload) {
-        ResponseEntity<Void> responseUpdatePayload;
 
-        String url = this.getURLFromBesyReference();
+        String pfeUrl = this.getPfeUrlFromBesyReference();
         String urlParams = "?bpmWorklistTaskId=" + bpmWorklistTaskId + "&bpmWorklistContext=" + bpmWorklistContext;
-        String completeUrl =  url+PAYLOAD_PATH+urlParams;
+        String completeUrl =  pfeUrl+PAYLOAD_PATH+urlParams;
         //System.out.println(completeUrl);
 
 
         try {
-           responseUpdatePayload = new RestTemplate().exchange(completeUrl, HttpMethod.PUT, new HttpEntity<>(updatedPayload), Void.class);
+            ResponseEntity<Void> responseUpdatePayload = new RestTemplate().exchange(completeUrl, HttpMethod.PUT, new HttpEntity<>(updatedPayload), Void.class);
             System.out.println(responseUpdatePayload);
             if(!responseUpdatePayload.getStatusCode().is2xxSuccessful()) throw new ErrorProcessException("Error haciendo update del payload");
         }
@@ -76,5 +74,25 @@ public class BPMService implements IBPMService {
         }
 
         return getPayload(bpmWorklistTaskId, bpmWorklistContext);
+    }
+
+    @Override
+    public void avanzarSolicitud(String bpmWorklistTaskId, String bpmWorklistContext, Map<String, String> body) {
+        String pfeUrl = getPfeUrlFromBesyReference();
+        String urlParams = "?bpmWorklistTaskId=" + bpmWorklistTaskId + "&bpmWorklistContext=" + bpmWorklistContext;
+        String completeUrl =  pfeUrl+AVANZAR_PATH+urlParams;
+        System.out.println(completeUrl);
+        System.out.println("body: "+body);
+        try {
+            ResponseEntity<Void> responseAvanzarSolicitud = new RestTemplate().exchange(completeUrl, HttpMethod.POST, new HttpEntity<>(body), Void.class);
+            System.out.println(responseAvanzarSolicitud);
+            //if(!responseAvanzarSolicitud.getStatusCode().is2xxSuccessful()) throw new ErrorProcessException("Error haciendo avanzar la solicitud: "+);
+        }
+        catch(Exception e) {
+            System.out.println("CATCH - Error haciendo avanazr la solicitud");
+            e.printStackTrace();
+            throw new ErrorProcessException("Error haciendo avanazr la solicitud: "+e.getMessage());
+        }
+
     }
 }
